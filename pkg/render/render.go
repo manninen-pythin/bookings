@@ -19,6 +19,10 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+	return td
+}
+
 // Renders template using html/template
 func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
@@ -38,6 +42,8 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData)
 
 	// create buffer
 	buf := new(bytes.Buffer)
+
+	td = AddDefaultData(td)
 
 	// write template to buffer
 	_ = t.Execute(buf, td)
