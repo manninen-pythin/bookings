@@ -8,6 +8,7 @@ import (
 	"text/template"
 
 	"github.com/manninen-pythin/bookings/pkg/config"
+	"github.com/manninen-pythin/bookings/pkg/models"
 )
 
 // Declare a AppConfig Struct
@@ -19,7 +20,7 @@ func NewTemplates(a *config.AppConfig) {
 }
 
 // Renders template using html/template
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 
 	if app.UseCache {
@@ -34,13 +35,12 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	if !ok {
 		log.Fatal("Could not get template from template cache")
 	}
-	// render template
 
 	// create buffer
 	buf := new(bytes.Buffer)
 
 	// write template to buffer
-	_ = t.Execute(buf, nil)
+	_ = t.Execute(buf, td)
 	// write buffer to w (http.ResponseWriter)
 	_, err := buf.WriteTo(w)
 	if err != nil {
