@@ -6,19 +6,33 @@ import (
 	"net/http"
 	"path/filepath"
 	"text/template"
+
+	"github.com/manninen-pythin/bookings/pkg/config"
 )
+
+// Declare a AppConfig Struct
+var app *config.AppConfig
+
+// Store Cache in App
+func NewTemplates(a *config.AppConfig) {
+	app = a
+}
 
 // Renders template using html/template
 func RenderTemplate(w http.ResponseWriter, tmpl string) {
-	// create a template cache
-	tc, err := createTemplateCache()
-	if err != nil {
-		log.Fatal(err)
+	var tc map[string]*template.Template
+
+	if app.UseCache {
+		tc = app.TemplateCache
+	} else {
+		// Get template cache from the app config
+		tc, _ = CreateTemplateCache()
 	}
+
 	// get requested template from cache
 	t, ok := tc[tmpl]
 	if !ok {
-		log.Fatal(err)
+		log.Fatal("Could not get template from template cache")
 	}
 	// render template
 
@@ -26,18 +40,15 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	buf := new(bytes.Buffer)
 
 	// write template to buffer
-	err = t.Execute(buf, nil)
-	if err != nil {
-		log.Println(err)
-	}
+	_ = t.Execute(buf, nil)
 	// write buffer to w (http.ResponseWriter)
-	_, err = buf.WriteTo(w)
+	_, err := buf.WriteTo(w)
 	if err != nil {
 		log.Println(err)
 	}
 }
 
-func createTemplateCache() (map[string]*template.Template, error) {
+func CreateTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 
 	pages, err := filepath.Glob("./templates/*.page.tmpl")
