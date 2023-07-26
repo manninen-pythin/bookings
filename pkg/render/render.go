@@ -11,7 +11,7 @@ import (
 	"github.com/manninen-pythin/bookings/pkg/models"
 )
 
-// Declare a AppConfig Struct
+// Declare an AppConfig Struct
 var app *config.AppConfig
 
 // Store Cache in App
